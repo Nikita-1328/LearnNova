@@ -1,21 +1,84 @@
-LearnNova
-An ed-tech platform where students can learn courses and instructors can create and share content.
+LearnNova 🚀
+An Interactive Ed-Tech Platform Built with MERN Stack
 
-Features
-Signup, login with OTP verification
-Browse and purchase courses
-Watch video lectures and rate courses
-Instructor dashboard to manage courses
-Payment integration with Razorpay
-Tech Stack
-Frontend — React, Redux, Tailwind CSS
-Backend — Node.js, Express.js, MongoDB
-Other — Cloudinary, Razorpay, JWT
-Installation
-git clone https://github.com/Nikita-1328/LearnNova.git
+Empowering students to learn, grow, and achieve through modern online education.
+
+📌 Overview
+
+LearnNova is a full-stack Ed-Tech platform inspired by modern learning management systems. It allows students to explore and purchase courses while enabling instructors to create and manage educational content seamlessly.
+
+Built using the MERN Stack (MongoDB, Express.js, React.js, Node.js), LearnNova provides a smooth and responsive learning experience with secure authentication, course management, payment integration, and cloud-based media handling.
+
+✨ Features
+👨‍🎓 Student Features
+Browse and search courses
+Add courses to wishlist
+Secure authentication & authorization
+Purchase courses online
+Watch video lectures and access resources
+Rate and review courses
+Edit profile and manage account
+👨‍🏫 Instructor Features
+Instructor dashboard
+Create, update, and delete courses
+Upload videos, thumbnails, and documents
+Track course performance and insights
+Manage students and content
+🔐 Authentication & Security
+JWT Authentication
+OTP Verification
+Forgot Password functionality
+Password hashing with bcrypt
+💳 Payment Integration
+Razorpay integration for secure payments
+☁️ Cloud Services
+Cloudinary for media storage
+MongoDB Atlas database hosting
+🛠️ Tech Stack
+Frontend
+React.js
+Redux Toolkit
+Tailwind CSS
+Axios
+React Router DOM
+Backend
+Node.js
+Express.js
+MongoDB
+Mongoose
+JWT
+Bcrypt
+Deployment
+Vercel (Frontend)
+Render / Railway (Backend)
+MongoDB Atlas
+Cloudinary
+
+⚙️ Installation & Setup
+1️⃣ Clone the Repository
+git clone https://github.com/your-username/LearnNova.git
 cd LearnNova
+2️⃣ Install Dependencies
+Frontend
+cd client
+npm install
+Backend
+cd server
+npm install
 
-cd backend && npm install && npm run dev
-cd frontend && npm install && npm start
-Author
-Made by Nikita
+▶️ Run the Project
+Start Backend
+cd server
+npm run 
+
+Start Frontend
+cd client
+npm start
+
+🌟 Future Enhancements
+AI-based course recommendations
+Gamification system
+Mobile application
+Live classes & chat system
+AR/VR learning experience
+Personalized learning paths
