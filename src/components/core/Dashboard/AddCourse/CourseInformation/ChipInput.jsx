@@ -25,7 +25,10 @@ export default function ChipInput({
       // console.log(course)
       setChips(course?.tag)
     }
-    register(name, { required: true, validate: (value) => value.length > 0 })
+    // Register the field without forcing it to be required so instructor
+    // can proceed without adding tags. Validation (if any) can be handled
+    // elsewhere or left optional.
+    register(name)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -96,7 +99,11 @@ export default function ChipInput({
           className="form-style w-full"
         />
       </div>
-      {/* Render an error message if the input is required and not filled */}
+      {/* Helper text with tag examples */}
+      <span className="ml-2 text-xs tracking-wide text-richblack-300">
+        Examples: React, JavaScript, Web Development. Press Enter or comma to add.
+      </span>
+      {/* Render an error message if present */}
       {errors[name] && (
         <span className="ml-2 text-xs tracking-wide text-pink-200">
           {label} is required

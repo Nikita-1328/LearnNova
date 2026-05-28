@@ -17,6 +17,14 @@ import Upload from "../Upload"
 import ChipInput from "./ChipInput"
 import RequirementsField from "./RequirementsField"
 
+const FALLBACK_CATEGORIES = [
+  { _id: "64be107c1122334455667788", name: "Python" },
+  { _id: "64be107c1122334455667789", name: "Web Development" },
+  { _id: "64be107c112233445566778a", name: "Data Science" },
+  { _id: "64be107c112233445566778b", name: "Machine Learning" },
+  { _id: "64be107c112233445566778c", name: "Mobile Development" }
+]
+
 export default function CourseInformationForm() {
   const {
     register,
@@ -36,9 +44,11 @@ export default function CourseInformationForm() {
     const getCategories = async () => {
       setLoading(true)
       const categories = await fetchCourseCategories()
-      if (categories.length > 0) {
-        // console.log("categories", categories)
+      if (categories && categories.length > 0) {
         setCourseCategories(categories)
+      } else {
+        console.log("No categories returned from API. Using local fallbacks.")
+        setCourseCategories(FALLBACK_CATEGORIES)
       }
       setLoading(false)
     }
@@ -306,6 +316,7 @@ export default function CourseInformationForm() {
         <IconBtn
           disabled={loading}
           text={!editCourse ? "Next" : "Save Changes"}
+          type="submit"
         >
           <MdNavigateNext />
         </IconBtn>

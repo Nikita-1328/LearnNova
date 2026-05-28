@@ -16,6 +16,7 @@ const {
 } = require("../controllers/Course")
 
 // Tags Controllers Import
+const { getAllTags } = require("../controllers/Tags")
 
 // Categories Controllers Import
 const {
@@ -75,6 +76,8 @@ router.post("/addSubSection", auth, isInstructor, createSubSection)
 router.get("/getInstructorCourses", auth, isInstructor, getInstructorCourses)
 // Get all Registered Courses
 router.get("/getAllCourses", getAllCourses)
+// Tags route
+router.get("/getAllTags", getAllTags)
 // Get Details for a Specific Courses
 router.post("/getCourseDetails", getCourseDetails)
 // Get Details for a Specific Courses

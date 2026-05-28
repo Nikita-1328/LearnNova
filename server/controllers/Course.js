@@ -26,8 +26,15 @@ exports.createCourse = async (req, res) => {
     // Get thumbnail image from request files
     const thumbnail = req.files.thumbnailImage
 
-    // Convert the tag and instructions from stringified Array to Array
-    const tag = JSON.parse(_tag)
+    // Convert the tag and instructions from stringified Array to Array (if provided)
+    let tag = []
+    if (_tag) {
+      try {
+        tag = JSON.parse(_tag)
+      } catch (err) {
+        tag = []
+      }
+    }
     const instructions = JSON.parse(_instructions)
 
     console.log("tag", tag)
@@ -39,7 +46,6 @@ exports.createCourse = async (req, res) => {
       !courseDescription ||
       !whatYouWillLearn ||
       !price ||
-      !tag.length ||
       !thumbnail ||
       !category ||
       !instructions.length

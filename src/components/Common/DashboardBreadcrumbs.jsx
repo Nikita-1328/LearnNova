@@ -24,7 +24,7 @@ export default function DashboardBreadcrumbs({ items }) {
               {item.label}
             </Link>
           ) : (
-            <span className="font-medium text-richblack-5">{item.label}</span>
+            <span className="font-medium text-yellow-50">{item.label}</span>
           )}
         </span>
       ))}

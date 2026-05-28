@@ -20,7 +20,7 @@ export default function SidebarLink({ link, iconName }) {
       onClick={() => dispatch(resetCourseState())}
       className={`relative flex items-center gap-x-3 py-3 pl-8 pr-4 text-sm font-medium transition-colors duration-200 ${
         isActive
-          ? "bg-richblack-800 text-richblack-5"
+          ? "bg-richblack-800 text-yellow-50"
           : "text-richblack-300 hover:bg-richblack-800/60 hover:text-richblack-5"
       } `}
     >

@@ -10,5 +10,13 @@ exports.uploadImageToCloudinary = async (file, folder, height, quality) => {
   }
   options.resource_type = "auto"
   console.log("OPTIONS", options)
-  return await cloudinary.uploader.upload(file.tempFilePath, options)
+  try {
+    return await cloudinary.uploader.upload(file.tempFilePath, options)
+  } catch (err) {
+    console.error("Cloudinary upload failed:", err.message || err)
+    // Rethrow with clearer message for frontend debugging
+    throw new Error(
+      `Cloudinary upload failed: ${err.message || "check CLOUD_NAME/API_KEY/API_SECRET in server/.env"}`
+    )
+  }
 }
