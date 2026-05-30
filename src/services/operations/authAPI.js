@@ -12,6 +12,7 @@ const {
   LOGIN_API,
   RESETPASSTOKEN_API,
   RESETPASSWORD_API,
+  GOOGLE_LOGIN_API,
 } = endpoints
 
 export function sendOtp(email, navigate) {
@@ -32,10 +33,13 @@ export function sendOtp(email, navigate) {
       }
 
       toast.success("OTP Sent Successfully")
-      navigate("/verify-email")
+      if (navigate) {
+        navigate("/verify-email")
+      }
     } catch (error) {
       console.log("SENDOTP API ERROR............", error)
-      toast.error("Could Not Send OTP")
+      const errorMessage = error.response?.data?.message || "Could Not Send OTP"
+      toast.error(errorMessage)
     }
     dispatch(setLoading(false))
     toast.dismiss(toastId)
@@ -75,7 +79,8 @@ export function signUp(
       navigate("/login")
     } catch (error) {
       console.log("SIGNUP API ERROR............", error)
-      toast.error("Signup Failed")
+      const errorMessage = error.response?.data?.message || "Signup Failed"
+      toast.error(errorMessage)
       navigate("/signup")
     }
     dispatch(setLoading(false))
@@ -111,7 +116,77 @@ export function login(email, password, navigate) {
       navigate("/dashboard/my-profile")
     } catch (error) {
       console.log("LOGIN API ERROR............", error)
-      toast.error("Login Failed")
+      const errorMessage = error.response?.data?.message || "Login Failed"
+      toast.error(errorMessage)
+    }
+    dispatch(setLoading(false))
+    toast.dismiss(toastId)
+  }
+}
+
+export function loginWithGoogle(credential, navigate) {
+  return async (dispatch) => {
+    const toastId = toast.loading("Loading...")
+    dispatch(setLoading(true))
+    try {
+      const response = await apiConnector("POST", GOOGLE_LOGIN_API, {
+        credential,
+      })
+
+      console.log("GOOGLE LOGIN RESPONSE............", response)
+
+      if (!response.data.success) {
+        throw new Error(response.data.message)
+      }
+
+      toast.success("Login Successful")
+      dispatch(setToken(response.data.token))
+      const userImage = response.data?.user?.image
+        ? response.data.user.image
+        : `https://api.dicebear.com/5.x/initials/svg?seed=${response.data.user.firstName} ${response.data.user.lastName}`
+      dispatch(setUser({ ...response.data.user, image: userImage }))
+
+      localStorage.setItem("token", JSON.stringify(response.data.token))
+      navigate("/dashboard/my-profile")
+    } catch (error) {
+      console.log("GOOGLE LOGIN ERROR............", error)
+      const errorMessage = error.response?.data?.message || "Google Login Failed"
+      toast.error(errorMessage)
+    }
+    dispatch(setLoading(false))
+    toast.dismiss(toastId)
+  }
+}
+
+export function signUpWithGoogle(credential, accountType, navigate) {
+  return async (dispatch) => {
+    const toastId = toast.loading("Loading...")
+    dispatch(setLoading(true))
+    try {
+      const response = await apiConnector("POST", GOOGLE_LOGIN_API, {
+        credential,
+        accountType,
+      })
+
+      console.log("GOOGLE SIGNUP RESPONSE............", response)
+
+      if (!response.data.success) {
+        throw new Error(response.data.message)
+      }
+
+      toast.success("Signup Successful")
+      dispatch(setToken(response.data.token))
+      const userImage = response.data?.user?.image
+        ? response.data.user.image
+        : `https://api.dicebear.com/5.x/initials/svg?seed=${response.data.user.firstName} ${response.data.user.lastName}`
+      dispatch(setUser({ ...response.data.user, image: userImage }))
+
+      localStorage.setItem("token", JSON.stringify(response.data.token))
+      navigate("/dashboard/my-profile")
+    } catch (error) {
+      console.log("GOOGLE SIGNUP ERROR............", error)
+      const errorMessage = error.response?.data?.message || "Google Signup Failed"
+      toast.error(errorMessage)
     }
     dispatch(setLoading(false))
     toast.dismiss(toastId)
@@ -137,7 +212,8 @@ export function getPasswordResetToken(email, setEmailSent) {
       setEmailSent(true)
     } catch (error) {
       console.log("RESETPASSTOKEN ERROR............", error)
-      toast.error("Failed To Send Reset Email")
+      const errorMessage = error.response?.data?.message || "Failed To Send Reset Email"
+      toast.error(errorMessage)
     }
     toast.dismiss(toastId)
     dispatch(setLoading(false))
@@ -165,7 +241,8 @@ export function resetPassword(password, confirmPassword, token, navigate) {
       navigate("/login")
     } catch (error) {
       console.log("RESETPASSWORD ERROR............", error)
-      toast.error("Failed To Reset Password")
+      const errorMessage = error.response?.data?.message || "Failed To Reset Password"
+      toast.error(errorMessage)
     }
     toast.dismiss(toastId)
     dispatch(setLoading(false))

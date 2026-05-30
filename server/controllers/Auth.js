@@ -288,3 +288,110 @@ exports.changePassword = async (req, res) => {
     })
   }
 }
+
+// Google OAuth Login / Signup controller
+exports.googleLogin = async (req, res) => {
+  try {
+    const { credential, accountType } = req.body
+
+    if (!credential) {
+      return res.status(400).json({
+        success: false,
+        message: "Google credential is required",
+      })
+    }
+
+    // Verify Google token via Google's tokeninfo API
+    const googleResponse = await fetch(
+      `https://oauth2.googleapis.com/tokeninfo?id_token=${credential}`
+    )
+    if (!googleResponse.ok) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid Google credential",
+      })
+    }
+
+    const payload = await googleResponse.json()
+    const { email, given_name, family_name, picture, email_verified } = payload
+
+    if (!email_verified) {
+      return res.status(400).json({
+        success: false,
+        message: "Google email is not verified",
+      })
+    }
+
+    // Check if user already exists
+    let user = await User.findOne({ email }).populate("additionalDetails")
+
+    if (!user) {
+      // Auto-register (sign up) new user
+      const firstName = given_name || "Google"
+      const lastName = family_name || "User"
+      const userAccountType = accountType || "Student"
+
+      // Create linked profile
+      const profileDetails = await Profile.create({
+        gender: null,
+        dateOfBirth: null,
+        about: null,
+        contactNumber: null,
+      })
+
+      // Generate secure random password
+      const tempPassword = Math.random().toString(36).slice(-10) + Math.random().toString(36).slice(-10)
+      const hashedPassword = await bcrypt.hash(tempPassword, 10)
+
+      const approved = userAccountType === "Instructor" ? false : true
+
+      user = await User.create({
+        firstName,
+        lastName,
+        email,
+        contactNumber: "",
+        password: hashedPassword,
+        accountType: userAccountType,
+        approved: approved,
+        additionalDetails: profileDetails._id,
+        image: picture || `https://api.dicebear.com/5.x/initials/svg?seed=${firstName} ${lastName}`,
+      })
+
+      // Populate additionalDetails for response
+      user = await User.findById(user._id).populate("additionalDetails")
+    }
+
+    // Generate JWT token
+    const token = jwt.sign(
+      { email: user.email, id: user._id, role: user.accountType },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "24h",
+      }
+    )
+
+    user.token = token
+    user.password = undefined
+
+    // Set cookie and send response
+    const options = {
+      expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+      httpOnly: true,
+    }
+
+    res.cookie("token", token, options).status(200).json({
+      success: true,
+      token,
+      user,
+      message: "Google login successful",
+    })
+  } catch (error) {
+    console.error("Google login error:", error)
+    return res.status(500).json({
+      success: false,
+      message: "Google login failure",
+      error: error.message,
+    })
+  }
+}
+

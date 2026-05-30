@@ -1,10 +1,10 @@
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { toast } from "react-hot-toast"
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai"
 import { useDispatch } from "react-redux"
 import { useNavigate } from "react-router-dom"
 
-import { sendOtp } from "../../../services/operations/authAPI"
+import { sendOtp, signUpWithGoogle } from "../../../services/operations/authAPI"
 import { setSignupData } from "../../../slices/authSlice"
 import { ACCOUNT_TYPE } from "../../../utils/constants"
 import Tab from "../../Common/Tab"
@@ -31,21 +31,23 @@ function SignupForm() {
 
   const { firstName, lastName, email, password, confirmPassword } = formData
 
+  // Keep track of accountType in a ref so Google Callback always gets the latest selection
+  const accountTypeRef = useRef(accountType)
+  useEffect(() => {
+    accountTypeRef.current = accountType
+  }, [accountType])
+
   // Handle input fields, when some value changes
   const handleOnChange = (e) => {
     setFormData((prevData) => ({
       ...prevData,
       [e.target.name]: e.target.value,
     }));
-    // if(e.target.name === "password" && e.target.value.length<8) {
-    //   setPassAlert("Must be 8");
-    // }
   }
 
   // Handle Form Submission
   const handleOnSubmit = (e) => {
     e.preventDefault()
-    //const password = {password};
     if(password.length < 8){
       setPassAlert('Password must be of at least eight characters')
       return
@@ -77,6 +79,36 @@ function SignupForm() {
     setAccountType(ACCOUNT_TYPE.STUDENT)
   }
 
+  const handleGoogleCallback = (response) => {
+    dispatch(signUpWithGoogle(response.credential, accountTypeRef.current, navigate))
+  }
+
+  useEffect(() => {
+    const script = document.createElement("script")
+    script.src = "https://accounts.google.com/gsi/client"
+    script.async = true;
+    script.defer = true;
+    document.body.appendChild(script)
+
+    script.onload = () => {
+      if (window.google) {
+        window.google.accounts.id.initialize({
+          client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID || "1016843513231-k4v03d21i4dfmff7u8ecclplf8p6r07o.apps.googleusercontent.com",
+          callback: handleGoogleCallback,
+        })
+        window.google.accounts.id.renderButton(
+          document.getElementById("googleSignUpDiv"),
+          { theme: "outline", size: "large", width: "450" }
+        )
+      }
+    }
+
+    return () => {
+      const scripts = document.querySelectorAll('script[src="https://accounts.google.com/gsi/client"]')
+      scripts.forEach(s => s.remove())
+    }
+  }, [])
+
   // data to pass to Tab component
   const tabData = [
     {
@@ -92,7 +124,7 @@ function SignupForm() {
   ]
 
   return (
-    <div>
+    <div className="w-full">
       {/* Tab */}
       <Tab tabData={tabData} field={accountType} setField={setAccountType} />
       {/* Form */}
@@ -200,6 +232,12 @@ function SignupForm() {
           Create Account
         </button>
       </form>
+      <div className="flex w-full items-center my-4 gap-x-2">
+        <div className="h-[1px] w-full bg-richblack-700"></div>
+        <p className="text-richblack-200 font-medium leading-[1.375rem]">OR</p>
+        <div className="h-[1px] w-full bg-richblack-700"></div>
+      </div>
+      <div id="googleSignUpDiv" className="w-full flex justify-center"></div>
     </div>
   )
 }

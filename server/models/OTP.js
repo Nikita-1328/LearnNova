@@ -37,11 +37,18 @@ async function sendVerificationEmail(email, otp) {
 	}
 }
 
-// After save: send OTP email (async hook — do not mix with next() in Mongoose 6+)
-OTPSchema.pre("save", async function () {
-	if (!this.isNew) return;
-	console.log("New OTP document, sending verification email to:", this.email);
-	await sendVerificationEmail(this.email, this.otp);
+// After save: send OTP email
+OTPSchema.pre("save", async function (next) {
+	if (this.isNew) {
+		console.log("New OTP document, sending verification email to:", this.email);
+		try {
+			await sendVerificationEmail(this.email, this.otp);
+		} catch (error) {
+			console.log("Error sending verification email: ", error);
+			return next(error);
+		}
+	}
+	next();
 });
 
 const OTP = mongoose.model("OTP", OTPSchema);
